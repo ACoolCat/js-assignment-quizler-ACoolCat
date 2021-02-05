@@ -34,15 +34,23 @@ const askForQuestions = [
 
 const createQuiz = title =>
   prompt(askForQuestions)
-    .then(answer =>
-      // TODO
-      console.log(answer)
-    )
+    .then(answer => createPrompt(answer))
+    .then(createdPrompt => prompt(createdPrompt))
+    .then(ans => createQuestions(ans))
+    .then(qurestionsFile => writeFile(`./src/quizzes/${title}.json`, JSON.stringify(qurestionsFile)))
     .catch(err => console.log('Error creating the quiz.', err))
 
-// const takeQuiz = (title, output) => TODO
+ const takeQuiz = (title, output) =>
+  readFile(`./src/quizzes/${title}.json`)
+  .then(data => JSON.parse(data))
+  .then(parsedData => {let questions = createQuestions(parsedData)
+    prompt(questions)
+    .then(answers => {let filePath `src/quizzes/` + output writeFile(filePath, answers)})
+  })
 
-// const takeRandomQuiz = (quizzes, output, n) => TODO
+ const takeRandomQuiz = (quizzes, output, n) => {
+   chooseRandom(createQuiz());
+ }
 
 cli
   .command(
@@ -59,7 +67,7 @@ cli
     'Loads a quiz and saves the users answers to the given outputFile'
   )
   .action(function (input, callback) {
-    // TODO implement functionality for taking a quiz
+    return takeQuiz(input.fileName);
   })
 
 cli
@@ -70,7 +78,7 @@ cli
       ' Then, saves the users answers to the given outputFile'
   )
   .action(function (input, callback) {
-    // TODO implement the functionality for taking a random quiz
+    return takeRandomQuiz(input.fileName);
   })
 
 cli.delimiter(cli.chalk['yellow']('quizler>')).show()
